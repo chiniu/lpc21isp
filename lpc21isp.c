@@ -1960,6 +1960,11 @@ static int LoadFile(ISP_ENVIRONMENT *IspEnvironment, const char *filename, int F
 */
 static int LoadFiles1(ISP_ENVIRONMENT *IspEnvironment, const FILE_LIST *file)
 {
+
+    if(!file->prev)
+    {
+        return 0; //last file
+    }
     int ret_val;
 
     if(!file || !file->prev)
@@ -1970,7 +1975,7 @@ static int LoadFiles1(ISP_ENVIRONMENT *IspEnvironment, const FILE_LIST *file)
     DebugPrintf( 3, "Follow file list %s\n", file->name);
 
     ret_val = LoadFiles1( IspEnvironment, file->prev);
-    if( ret_val != 0)
+    if( ret_val != 0 && file->prev != 0)
     {
         return ret_val;
     }
@@ -2115,6 +2120,7 @@ int main(int argc, char *argv[])
 #endif
 {
     ISP_ENVIRONMENT IspEnvironment;
+    FILE_LIST nullfile = {"", NULL, 0};
 
     // Initialize debug level
     debug_level = 2;
@@ -2126,6 +2132,7 @@ int main(int argc, char *argv[])
     IspEnvironment.ProgramChip = TRUE;                        // Default to Programming the chip
     IspEnvironment.nQuestionMarks = 100;
     IspEnvironment.DoNotStart = 0;
+    IspEnvironment.f_list = &nullfile;
     ReadArguments(&IspEnvironment, argc, argv);               // Read and parse the command line
 
     return PerformActions(&IspEnvironment);                   // Do as requested !
